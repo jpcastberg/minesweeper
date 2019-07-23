@@ -7,10 +7,10 @@
     "build": "webpack -d -w",
     "start": "reload -d public/ -b",
     "build-prod": "webpack -p",
-    "start-prod":  "node server/index.js"
+    "start-prod": "node server/index.js"
   },
-  "engines" : { 
-    "node" : ">=8.0.0" 
+  "engines": {
+    "node": ">=8.0.0"
   },
   "author": "John Castberg",
   "license": "ISC",
@@ -32,6 +32,7 @@
     "html-webpack-plugin": "^3.2.0",
     "nodemon": "^1.19.1",
     "reload": "^3.0.1",
-    "webpack": "^4.37.0"
+    "webpack": "^4.37.0",
+    "webpack-cli": "^3.3.6"
   }
 }
