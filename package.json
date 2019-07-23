@@ -9,6 +9,9 @@
     "build-prod": "webpack -p",
     "start-prod":  "node server/index.js"
   },
+  "engines" : { 
+    "node" : ">=8.0.0" 
+  },
   "author": "John Castberg",
   "license": "ISC",
   "dependencies": {
