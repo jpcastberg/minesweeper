@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-const HelloWorld = () => (
-  <div>Hello World!</div>
-);
+import Game from './components/Game';
 
-ReactDOM.render(<HelloWorld />, document.getElementById('app'));
+ReactDOM.render(<Game />, document.getElementById('app'));
