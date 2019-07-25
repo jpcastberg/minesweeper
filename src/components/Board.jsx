@@ -6,12 +6,8 @@ import Tile from './Tile';
 class Board extends Component {
   constructor(props) {
     super(props);
-    this.forEachTileAround = this.forEachTileAround.bind(this);
-    this.generateTiles = this.generateTiles.bind(this);
-    this.getRandomId = this.getRandomId.bind(this);
-    this.revealTile = this.revealTile.bind(this);
-    this.setState = this.setState.bind(this);
     this.state = this.initializeBoard();
+    this.revealTile = this.revealTile.bind(this);
   }
 
   getRandomId() {
@@ -51,10 +47,7 @@ class Board extends Component {
   }
 
   initializeBoard() {
-    const {
-      props: { boardHeight, boardWidth, numberOfMines },
-      forEachTileAround, getRandomId,
-    } = this;
+    const { props: { boardHeight, boardWidth, numberOfMines } } = this;
     const tileData = {};
     for (let i = 0; i < boardHeight; i += 1) {
       for (let j = 0; j < boardWidth; j += 1) {
@@ -72,7 +65,7 @@ class Board extends Component {
       let idAtWhichToPlaceMine;
       // Attempt to place the mine randomly
       while (!idAtWhichToPlaceMine && randomAttempts < 10) {
-        const randomId = getRandomId();
+        const randomId = this.getRandomId();
         if (tileData[randomId].isMine) {
           randomAttempts += 1;
         } else {
@@ -92,7 +85,7 @@ class Board extends Component {
         }
       }
       tileData[idAtWhichToPlaceMine].isMine = true;
-      forEachTileAround(idAtWhichToPlaceMine, (id) => {
+      this.forEachTileAround(idAtWhichToPlaceMine, (id) => {
         tileData[id].adjacentMineCount += 1;
       });
       countOfMinesToPlace -= 1;
@@ -108,18 +101,18 @@ class Board extends Component {
   }
 
   revealTile(id) {
-    const { state: tileData, setState } = this;
+    const { state: tileData } = this;
     const tileToReveal = tileData[id];
     const updatedTileData = { ...tileData, [id]: { ...tileToReveal, isRevealed: true } };
-    setState({ ...updatedTileData });
+    // const additionalTilesToReveal = {};
+    this.setState({ ...updatedTileData });
   }
 
   render() {
-    const { generateTiles } = this;
     return (
       <table>
         <tbody>
-          {generateTiles()}
+          {this.generateTiles()}
         </tbody>
       </table>
     );
