@@ -22,7 +22,7 @@ class Board extends Component {
     const validSurroundingTiles = [];
     for (let i = -1; i <= 1; i += 1) {
       for (let j = -1; j <= 1; j += 1) {
-        if (i !== 0 && j !== 0 && this.isValidId(`${rowIdx + i},${colIdx + j}`)) {
+        if ((i !== 0 || j !== 0) && this.isValidId(`${rowIdx + i},${colIdx + j}`)) {
           validSurroundingTiles.push(`${rowIdx + i},${colIdx + j}`);
         }
       }
