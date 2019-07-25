@@ -34,14 +34,27 @@ class Board extends Component {
     const { props: { boardHeight, boardWidth }, state: tileData, revealTile } = this;
     const tiles = [];
     for (let rowIdx = 0; rowIdx < boardHeight; rowIdx += 1) {
+      const tileIds = [];
       const tileRow = [];
       for (let colIdx = 0; colIdx < boardWidth; colIdx += 1) {
         const id = `${rowIdx},${colIdx}`;
+        tileIds.push(id);
         const currentTile = tileData[id];
-        const { isRevealed } = currentTile;
-        tileRow.push((<Tile isRevealed={isRevealed} onClick={() => (revealTile(id))} />));
+        const {
+          isRevealed, isMine, isFlagged, adjacentMineCount,
+        } = currentTile;
+        tileRow.push((
+          <Tile
+            key={id}
+            isRevealed={isRevealed}
+            isMine={isMine}
+            isFlagged={isFlagged}
+            adjacentMineCount={adjacentMineCount}
+            onClick={() => (revealTile(id))}
+          />
+        ));
       }
-      tiles.push(<tr>{tileRow}</tr>);
+      tiles.push(<tr key={tileIds.toString()}>{tileRow}</tr>);
     }
     return tiles;
   }
@@ -103,9 +116,8 @@ class Board extends Component {
   revealTile(id) {
     const { state: tileData } = this;
     const tileToReveal = tileData[id];
-    const updatedTileData = { ...tileData, [id]: { ...tileToReveal, isRevealed: true } };
     // const additionalTilesToReveal = {};
-    this.setState({ ...updatedTileData });
+    this.setState({ [id]: { ...tileToReveal, isRevealed: true } });
   }
 
   render() {
