@@ -50,7 +50,7 @@ class Board extends Component {
             isMine={isMine}
             isFlagged={isFlagged}
             adjacentMineCount={adjacentMineCount}
-            onClick={() => (revealTile(id))}
+            revealTile={() => (revealTile(id))}
           />
         ));
       }
