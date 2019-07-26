@@ -19,7 +19,7 @@ class Game extends Component {
       boardHeight: 10,
       boardWidth: 10,
       numberOfMines: 10,
-      gameInProgress: false,
+      gameIsInProgress: false,
       gameIsOver: false,
       playerWon: false,
     };
@@ -29,7 +29,7 @@ class Game extends Component {
 
   endGame(context) {
     const newState = {
-      gameInProgress: false,
+      gameIsInProgress: false,
       gameIsOver: true,
     };
     if (context.playerDidWin) {
@@ -39,13 +39,13 @@ class Game extends Component {
   }
 
   startGame() {
-    this.setState({ gameInProgress: true });
+    this.setState({ gameIsInProgress: true });
   }
 
   render() {
     const {
       state: {
-        boardHeight, boardWidth, numberOfMines, gameInProgress, gameIsOver,
+        boardHeight, boardWidth, numberOfMines, gameIsInProgress, gameIsOver,
       },
       startGame,
       endGame,
@@ -57,7 +57,7 @@ class Game extends Component {
           boardHeight={boardHeight}
           boardWidth={boardWidth}
           numberOfMines={numberOfMines}
-          gameInProgress={gameInProgress}
+          gameIsInProgress={gameIsInProgress}
           gameIsOver={gameIsOver}
           startGame={startGame}
           endGame={endGame}

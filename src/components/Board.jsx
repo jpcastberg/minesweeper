@@ -130,11 +130,11 @@ class Board extends Component {
   async handleTileClick(clickedId) {
     const {
       props: {
-        gameInProgress, startGame, gameIsOver,
+        gameIsInProgress, startGame, gameIsOver,
       },
     } = this;
-    if (!gameInProgress && gameIsOver) return;
-    if (!gameInProgress) {
+    if (!gameIsInProgress && gameIsOver) return;
+    if (!gameIsInProgress) {
       startGame();
       await this.populateMinesAround(clickedId);
     }
@@ -292,7 +292,7 @@ Board.propTypes = {
   boardHeight: propTypes.number.isRequired,
   boardWidth: propTypes.number.isRequired,
   numberOfMines: propTypes.number.isRequired,
-  gameInProgress: propTypes.bool.isRequired,
+  gameIsInProgress: propTypes.bool.isRequired,
   gameIsOver: propTypes.bool.isRequired,
   startGame: propTypes.func.isRequired,
   endGame: propTypes.func.isRequired,
