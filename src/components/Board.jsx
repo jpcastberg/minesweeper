@@ -129,20 +129,16 @@ class Board extends Component {
     const { state } = this;
     const clickedTile = state[clickedId];
     if (clickedTile.isRevealed || clickedTile.isFlagged) return;
-    const tileIdsToReveal = [];
+    const tileIdsToReveal = [clickedId];
     if (clickedTile.isMine) {
       await this.triggerMineAt(clickedId);
       const mineIds = this.getMineIds();
       mineIds.forEach((mineId) => {
+        if (mineId === clickedId) return;
         tileIdsToReveal.push(mineId);
       });
       endGame({ playerDidWin: false });
-    } else if (
-      !clickedTile.isMine
-      && !clickedTile.isFlagged
-      && clickedTile.adjacentMineCount === 0
-    ) {
-      tileIdsToReveal.push(clickedId);
+    } else if (clickedTile.adjacentMineCount === 0) {
       const surroundingTileIdsToReveal = this.getTileIdsToRevealAround(clickedId);
       surroundingTileIdsToReveal.forEach((tileId) => {
         tileIdsToReveal.push(tileId);
