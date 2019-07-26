@@ -20,12 +20,8 @@ const TileStyle = styled.td`
 `;
 
 const Tile = ({
-  isRevealed, isMine, isFlagged, adjacentMineCount, revealTile,
+  isRevealed, isMine, isFlagged, adjacentMineCount, handleTileClick,
 }) => {
-  const handleTileClick = () => {
-    if (isRevealed || isFlagged) return;
-    revealTile();
-  };
   let tileContent;
   if (!isRevealed) {
     tileContent = null;
@@ -52,7 +48,7 @@ Tile.propTypes = {
   isMine: propTypes.bool.isRequired,
   isFlagged: propTypes.bool.isRequired,
   adjacentMineCount: propTypes.number.isRequired,
-  revealTile: propTypes.func.isRequired,
+  handleTileClick: propTypes.func.isRequired,
 };
 
 export default Tile;

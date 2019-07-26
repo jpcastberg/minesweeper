@@ -9,7 +9,7 @@ class Board extends Component {
   constructor(props) {
     super(props);
     this.state = this.initializeBoard();
-    this.revealTile = this.revealTile.bind(this);
+    this.handleTileClick = this.handleTileClick.bind(this);
   }
 
   getRandomId() {
@@ -19,31 +19,31 @@ class Board extends Component {
   }
 
   getTileIdsToRevealAround(id) {
-    const { state: tileData } = this;
+    const { state } = this;
     const tileIds = [];
     const seen = { [id]: { hasBeenProcessed: true } };
     const queue = [];
-    this.forEachTileAround(id, (surroundingTileId) => {
-      if (!tileData[surroundingTileId].isRevealed) {
-        queue.push(surroundingTileId);
-        seen[surroundingTileId] = { hasBeenProcessed: false };
+    this.forEachTileAround(id, (surroundingTile) => {
+      if (!state[surroundingTile.id].isRevealed) {
+        queue.push(surroundingTile.id);
+        seen[surroundingTile.id] = { hasBeenProcessed: false };
       }
     });
     while (queue.length > 0) {
       const currentId = queue.shift();
       if (!seen[currentId].hasBeenProcessed) {
         if (
-          !tileData[currentId].isMine
-          && !tileData[currentId].isFlagged
-          && !tileData[currentId].isRevealed
+          !state[currentId].isMine
+          && !state[currentId].isFlagged
+          && !state[currentId].isRevealed
         ) {
           tileIds.push(currentId);
         }
-        if (tileData[currentId].adjacentMineCount === 0) {
-          this.forEachTileAround(currentId, (surroundingTileId) => {
-            if (!seen[surroundingTileId]) {
-              queue.push(surroundingTileId);
-              seen[surroundingTileId] = { hasBeenProcessed: false };
+        if (state[currentId].adjacentMineCount === 0) {
+          this.forEachTileAround(currentId, (surroundingTile) => {
+            if (!seen[surroundingTile.id]) {
+              queue.push(surroundingTile.id);
+              seen[surroundingTile.id] = { hasBeenProcessed: false };
             }
           });
         }
@@ -54,21 +54,23 @@ class Board extends Component {
   }
 
   forEachTileAround(id, cb) {
+    const { state } = this;
     const rowIdx = Number(id.split(',')[0]);
     const colIdx = Number(id.split(',')[1]);
     const validSurroundingTiles = [];
     for (let i = -1; i <= 1; i += 1) {
       for (let j = -1; j <= 1; j += 1) {
-        if ((i !== 0 || j !== 0) && this.isValidId(`${rowIdx + i},${colIdx + j}`)) {
-          validSurroundingTiles.push(`${rowIdx + i},${colIdx + j}`);
+        const currentId = `${rowIdx + i},${colIdx + j}`;
+        if ((i !== 0 || j !== 0) && this.isValidId(currentId)) {
+          validSurroundingTiles.push(state[currentId]);
         }
       }
     }
     validSurroundingTiles.forEach(cb);
   }
 
-  generateTiles() {
-    const { props: { boardHeight, boardWidth }, state: tileData, revealTile } = this;
+  generateTileElements() {
+    const { props: { boardHeight, boardWidth }, state, handleTileClick } = this;
     const tiles = [];
     for (let rowIdx = 0; rowIdx < boardHeight; rowIdx += 1) {
       const tileIds = [];
@@ -76,7 +78,7 @@ class Board extends Component {
       for (let colIdx = 0; colIdx < boardWidth; colIdx += 1) {
         const id = `${rowIdx},${colIdx}`;
         tileIds.push(id);
-        const currentTile = tileData[id];
+        const currentTile = state[id];
         const {
           isRevealed, isMine, isFlagged, adjacentMineCount,
         } = currentTile;
@@ -87,7 +89,7 @@ class Board extends Component {
             isMine={isMine}
             isFlagged={isFlagged}
             adjacentMineCount={adjacentMineCount}
-            revealTile={() => (revealTile(id))}
+            handleTileClick={() => (handleTileClick(id))}
           />
         ));
       }
@@ -96,12 +98,60 @@ class Board extends Component {
     return tiles;
   }
 
-  handleFirstClick(clickedId) {
-    const { state: tileData, props: { boardHeight, boardWidth, numberOfMines } } = this;
+  async handleTileClick(clickedId) {
+    const { props: { gameInProgress, toggleGameInProgress, gameOver } } = this;
+    if (!gameInProgress) {
+      toggleGameInProgress();
+      await this.populateMinesAround(clickedId);
+    }
+    const { state } = this;
+    const clickedTile = state[clickedId];
+    if (clickedTile.isRevealed || clickedTile.isFlagged || gameOver) return;
+    const tileIdsToReveal = [clickedId];
+    if (
+      !clickedTile.isMine
+      && !clickedTile.isFlagged
+      && clickedTile.adjacentMineCount === 0
+    ) {
+      const surroundingTileIdsToReveal = this.getTileIdsToRevealAround(clickedId);
+      surroundingTileIdsToReveal.forEach((tileId) => {
+        tileIdsToReveal.push(tileId);
+      });
+    }
+    this.revealTiles(tileIdsToReveal);
+  }
+
+  initializeBoard() {
+    const { props: { boardHeight, boardWidth } } = this;
+    const tileData = {};
+    for (let i = 0; i < boardHeight; i += 1) {
+      for (let j = 0; j < boardWidth; j += 1) {
+        const currentId = `${i},${j}`;
+        tileData[currentId] = {
+          id: currentId,
+          isRevealed: false,
+          isMine: false,
+          isFlagged: false,
+          adjacentMineCount: 0,
+        };
+      }
+    }
+    return tileData;
+  }
+
+  isValidId(id) {
+    const { props: { boardHeight, boardWidth } } = this;
+    const rowIdx = Number(id.split(',')[0]);
+    const colIdx = Number(id.split(',')[1]);
+    return (rowIdx >= 0 && rowIdx < boardHeight && colIdx >= 0 && colIdx < boardWidth);
+  }
+
+  populateMinesAround(clickedId) {
+    const { state, props: { boardHeight, boardWidth, numberOfMines } } = this;
     const offLimitsToMines = { [clickedId]: true };
     if ((boardHeight * boardWidth) - numberOfMines >= 9) {
-      this.forEachTileAround(clickedId, (surroundingTileId) => {
-        offLimitsToMines[surroundingTileId] = true;
+      this.forEachTileAround(clickedId, (surroundingTile) => {
+        offLimitsToMines[surroundingTile.id] = true;
       });
     }
     const updatedMineData = {};
@@ -133,12 +183,13 @@ class Board extends Component {
         }
       }
       updatedMineData[idAtWhichToPlaceMine] = {
-        ...updatedMineData[idAtWhichToPlaceMine] || tileData[idAtWhichToPlaceMine],
+        ...updatedMineData[idAtWhichToPlaceMine] || state[idAtWhichToPlaceMine],
         isMine: true,
       };
-      this.forEachTileAround(idAtWhichToPlaceMine, (surroundingTileId) => {
-        const existingTileData = updatedMineData[surroundingTileId] || tileData[surroundingTileId];
-        updatedMineData[surroundingTileId] = {
+      this.forEachTileAround(idAtWhichToPlaceMine, (surroundingTile) => {
+        const existingTileData = updatedMineData[surroundingTile.id]
+        || state[surroundingTile.id];
+        updatedMineData[surroundingTile.id] = {
           ...existingTileData,
           adjacentMineCount: existingTileData.adjacentMineCount + 1,
         };
@@ -151,56 +202,20 @@ class Board extends Component {
     });
   }
 
-  initializeBoard() {
-    const { props: { boardHeight, boardWidth } } = this;
-    const tileData = {};
-    for (let i = 0; i < boardHeight; i += 1) {
-      for (let j = 0; j < boardWidth; j += 1) {
-        tileData[`${i},${j}`] = {
-          isRevealed: false,
-          isMine: false,
-          isFlagged: false,
-          adjacentMineCount: 0,
-        };
-      }
-    }
-    return tileData;
-  }
-
-  isValidId(id) {
-    const { props: { boardHeight, boardWidth } } = this;
-    const rowIdx = Number(id.split(',')[0]);
-    const colIdx = Number(id.split(',')[1]);
-    return (rowIdx >= 0 && rowIdx < boardHeight && colIdx >= 0 && colIdx < boardWidth);
-  }
-
-  async revealTile(id) {
-    const { props: { gameInProgress, toggleGameInProgress } } = this;
-    if (!gameInProgress) {
-      toggleGameInProgress();
-      await this.handleFirstClick(id);
-    }
-    const { state: tileData } = this;
-    const updatedState = { [id]: { ...tileData[id], isRevealed: true } };
-    if (!tileData[id].isMine && !tileData[id].isFlagged && tileData[id].adjacentMineCount === 0) {
-      const tileIdsToReveal = this.getTileIdsToRevealAround(id);
-      tileIdsToReveal.forEach((tileId) => {
-        updatedState[tileId] = {
-          ...tileData[tileId],
-          isRevealed: true,
-        };
-      });
-    }
-    this.setState({
-      ...updatedState,
+  revealTiles(idList) {
+    const { state } = this;
+    const newState = {};
+    idList.forEach((id) => {
+      newState[id] = { ...state[id], isRevealed: true };
     });
+    this.setState({ ...newState });
   }
 
   render() {
     return (
       <table>
         <tbody>
-          {this.generateTiles()}
+          {this.generateTileElements()}
         </tbody>
       </table>
     );
@@ -212,6 +227,7 @@ Board.propTypes = {
   boardWidth: propTypes.number.isRequired,
   numberOfMines: propTypes.number.isRequired,
   gameInProgress: propTypes.bool.isRequired,
+  gameOver: propTypes.bool.isRequired,
   toggleGameInProgress: propTypes.func.isRequired,
 };
 
