@@ -9,30 +9,30 @@ class Game extends Component {
       boardHeight: 10,
       boardWidth: 10,
       numberOfMines: 10,
-      gameStarted: false,
+      gameInProgress: false,
     };
-    this.toggleGameStarted = this.toggleGameStarted.bind(this);
+    this.toggleGameInProgress = this.toggleGameInProgress.bind(this);
   }
 
-  toggleGameStarted() {
-    const { state: { gameStarted } } = this;
-    this.setState({ gameStarted: !gameStarted });
+  toggleGameInProgress() {
+    const { state: { gameInProgress } } = this;
+    this.setState({ gameInProgress: !gameInProgress });
   }
 
   render() {
     const {
       state: {
-        boardHeight, boardWidth, numberOfMines, gameStarted,
+        boardHeight, boardWidth, numberOfMines, gameInProgress,
       },
-      toggleGameStarted,
+      toggleGameInProgress,
     } = this;
     return (
       <Board
         boardHeight={boardHeight}
         boardWidth={boardWidth}
         numberOfMines={numberOfMines}
-        gameStarted={gameStarted}
-        toggleGameStarted={toggleGameStarted}
+        gameInProgress={gameInProgress}
+        toggleGameInProgress={toggleGameInProgress}
       />
     );
   }

@@ -175,9 +175,9 @@ class Board extends Component {
   }
 
   async revealTile(id) {
-    const { props: { gameStarted, toggleGameStarted } } = this;
-    if (!gameStarted) {
-      toggleGameStarted();
+    const { props: { gameInProgress, toggleGameInProgress } } = this;
+    if (!gameInProgress) {
+      toggleGameInProgress();
       await this.handleFirstClick(id);
     }
     const { state: tileData } = this;
@@ -211,8 +211,8 @@ Board.propTypes = {
   boardHeight: propTypes.number.isRequired,
   boardWidth: propTypes.number.isRequired,
   numberOfMines: propTypes.number.isRequired,
-  gameStarted: propTypes.bool.isRequired,
-  toggleGameStarted: propTypes.func.isRequired,
+  gameInProgress: propTypes.bool.isRequired,
+  toggleGameInProgress: propTypes.func.isRequired,
 };
 
 export default Board;
