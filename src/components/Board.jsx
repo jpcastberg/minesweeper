@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import propTypes from 'prop-types';
+// eslint-disable-next-line no-unused-vars
+import regeneratorRuntime from 'regenerator-runtime';
 
 import Tile from './Tile';
 
@@ -14,6 +16,41 @@ class Board extends Component {
     const { props: { boardHeight, boardWidth } } = this;
     const getRandomInt = max => (Math.floor(Math.random() * max));
     return `${getRandomInt(boardHeight)},${getRandomInt(boardWidth)}`;
+  }
+
+  getTileIdsToRevealAround(id) {
+    const { state: tileData } = this;
+    const tileIds = [];
+    const seen = { [id]: { hasBeenProcessed: true } };
+    const queue = [];
+    this.forEachTileAround(id, (surroundingTileId) => {
+      if (!tileData[surroundingTileId].isRevealed) {
+        queue.push(surroundingTileId);
+        seen[surroundingTileId] = { hasBeenProcessed: false };
+      }
+    });
+    while (queue.length > 0) {
+      const currentId = queue.shift();
+      if (!seen[currentId].hasBeenProcessed) {
+        if (
+          !tileData[currentId].isMine
+          && !tileData[currentId].isFlagged
+          && !tileData[currentId].isRevealed
+        ) {
+          tileIds.push(currentId);
+        }
+        if (tileData[currentId].adjacentMineCount === 0) {
+          this.forEachTileAround(currentId, (surroundingTileId) => {
+            if (!seen[surroundingTileId]) {
+              queue.push(surroundingTileId);
+              seen[surroundingTileId] = { hasBeenProcessed: false };
+            }
+          });
+        }
+        seen[currentId].hasBeenProcessed = true;
+      }
+    }
+    return tileIds;
   }
 
   forEachTileAround(id, cb) {
@@ -59,8 +96,63 @@ class Board extends Component {
     return tiles;
   }
 
+  handleFirstClick(clickedId) {
+    const { state: tileData, props: { boardHeight, boardWidth, numberOfMines } } = this;
+    const offLimitsToMines = { [clickedId]: true };
+    if ((boardHeight * boardWidth) - numberOfMines >= 9) {
+      this.forEachTileAround(clickedId, (surroundingTileId) => {
+        offLimitsToMines[surroundingTileId] = true;
+      });
+    }
+    const updatedMineData = {};
+    for (let minesPlaced = 1; minesPlaced <= numberOfMines; minesPlaced += 1) {
+      let idAtWhichToPlaceMine;
+      // Attempt to place the mine randomly
+      for (let attemptCount = 0; attemptCount <= 10 && !idAtWhichToPlaceMine; attemptCount += 1) {
+        const randomId = this.getRandomId();
+        if (
+          !offLimitsToMines[randomId]
+          && (!updatedMineData[randomId]
+          || !updatedMineData[randomId].isMine)
+        ) {
+          idAtWhichToPlaceMine = randomId;
+        }
+      }
+      // If 10 random attempts fail, place mine at first open space on board
+      if (!idAtWhichToPlaceMine) {
+        for (let i = 0; i < boardHeight && !idAtWhichToPlaceMine; i += 1) {
+          for (let j = 0; j < boardWidth && !idAtWhichToPlaceMine; j += 1) {
+            const currentId = `${i},${j}`;
+            if (
+              (!updatedMineData[currentId] || !updatedMineData[currentId].isMine)
+              && !offLimitsToMines[currentId]
+            ) {
+              idAtWhichToPlaceMine = currentId;
+            }
+          }
+        }
+      }
+      updatedMineData[idAtWhichToPlaceMine] = {
+        ...updatedMineData[idAtWhichToPlaceMine] || tileData[idAtWhichToPlaceMine],
+        isMine: true,
+      };
+      this.forEachTileAround(idAtWhichToPlaceMine, (surroundingTileId) => {
+        const existingTileData = updatedMineData[surroundingTileId] || tileData[surroundingTileId];
+        updatedMineData[surroundingTileId] = {
+          ...existingTileData,
+          adjacentMineCount: existingTileData.adjacentMineCount + 1,
+        };
+      });
+    }
+    return new Promise((res) => {
+      this.setState({ ...updatedMineData }, () => {
+        res();
+      });
+    });
+  }
+
   initializeBoard() {
-    const { props: { boardHeight, boardWidth, numberOfMines } } = this;
+    const { props: { boardHeight, boardWidth } } = this;
     const tileData = {};
     for (let i = 0; i < boardHeight; i += 1) {
       for (let j = 0; j < boardWidth; j += 1) {
@@ -72,37 +164,6 @@ class Board extends Component {
         };
       }
     }
-    let countOfMinesToPlace = numberOfMines;
-    while (countOfMinesToPlace > 0) {
-      let randomAttempts = 0;
-      let idAtWhichToPlaceMine;
-      // Attempt to place the mine randomly
-      while (!idAtWhichToPlaceMine && randomAttempts < 10) {
-        const randomId = this.getRandomId();
-        if (tileData[randomId].isMine) {
-          randomAttempts += 1;
-        } else {
-          idAtWhichToPlaceMine = randomId;
-        }
-      }
-      // If 10 random attempts fail, place mine at first open space on board
-      if (!idAtWhichToPlaceMine) {
-        for (let i = 0; i < boardHeight; i += 1) {
-          for (let j = 0; j < boardWidth; j += 1) {
-            if (!tileData[`${i},${j}`].isMine) {
-              idAtWhichToPlaceMine = `${i},${j}`;
-            }
-            break;
-          }
-          if (idAtWhichToPlaceMine) break;
-        }
-      }
-      tileData[idAtWhichToPlaceMine].isMine = true;
-      this.forEachTileAround(idAtWhichToPlaceMine, (id) => {
-        tileData[id].adjacentMineCount += 1;
-      });
-      countOfMinesToPlace -= 1;
-    }
     return tileData;
   }
 
@@ -113,11 +174,26 @@ class Board extends Component {
     return (rowIdx >= 0 && rowIdx < boardHeight && colIdx >= 0 && colIdx < boardWidth);
   }
 
-  revealTile(id) {
+  async revealTile(id) {
+    const { props: { gameStarted, toggleGameStarted } } = this;
+    if (!gameStarted) {
+      toggleGameStarted();
+      await this.handleFirstClick(id);
+    }
     const { state: tileData } = this;
-    const tileToReveal = tileData[id];
-    // const additionalTilesToReveal = {};
-    this.setState({ [id]: { ...tileToReveal, isRevealed: true } });
+    const updatedState = { [id]: { ...tileData[id], isRevealed: true } };
+    if (!tileData[id].isMine && !tileData[id].isFlagged && tileData[id].adjacentMineCount === 0) {
+      const tileIdsToReveal = this.getTileIdsToRevealAround(id);
+      tileIdsToReveal.forEach((tileId) => {
+        updatedState[tileId] = {
+          ...tileData[tileId],
+          isRevealed: true,
+        };
+      });
+    }
+    this.setState({
+      ...updatedState,
+    });
   }
 
   render() {
@@ -135,6 +211,8 @@ Board.propTypes = {
   boardHeight: propTypes.number.isRequired,
   boardWidth: propTypes.number.isRequired,
   numberOfMines: propTypes.number.isRequired,
+  gameStarted: propTypes.bool.isRequired,
+  toggleGameStarted: propTypes.func.isRequired,
 };
 
 export default Board;
