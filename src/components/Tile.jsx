@@ -20,10 +20,10 @@ const TileStyle = styled.td`
 `;
 
 const Tile = ({
-  isRevealed, isMine, isFlagged, adjacentMineCount, handleTileClick,
+  isRevealed, isMine, isFlagged, adjacentMineCount, handleTileClick, toggleFlag,
 }) => {
   let tileContent;
-  if (!isRevealed) {
+  if (!isRevealed && !isFlagged) {
     tileContent = null;
   } else if (isFlagged) {
     tileContent = (<span role="img" aria-label="Flag">🚩</span>);
@@ -35,6 +35,10 @@ const Tile = ({
   return (
     <TileStyle
       onClick={handleTileClick}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        toggleFlag();
+      }}
       isRevealed={isRevealed}
       adjacentMineCount={adjacentMineCount}
     >
@@ -49,6 +53,7 @@ Tile.propTypes = {
   isFlagged: propTypes.bool.isRequired,
   adjacentMineCount: propTypes.number.isRequired,
   handleTileClick: propTypes.func.isRequired,
+  toggleFlag: propTypes.func.isRequired,
 };
 
 export default Tile;

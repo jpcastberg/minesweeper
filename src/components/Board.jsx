@@ -10,6 +10,7 @@ class Board extends Component {
     super(props);
     this.state = this.initializeBoard();
     this.handleTileClick = this.handleTileClick.bind(this);
+    this.toggleFlagAt = this.toggleFlagAt.bind(this);
   }
 
   getRandomId() {
@@ -70,7 +71,9 @@ class Board extends Component {
   }
 
   generateTileElements() {
-    const { props: { boardHeight, boardWidth }, state, handleTileClick } = this;
+    const {
+      props: { boardHeight, boardWidth }, state, handleTileClick, toggleFlagAt,
+    } = this;
     const tiles = [];
     for (let rowIdx = 0; rowIdx < boardHeight; rowIdx += 1) {
       const tileIds = [];
@@ -89,7 +92,8 @@ class Board extends Component {
             isMine={isMine}
             isFlagged={isFlagged}
             adjacentMineCount={adjacentMineCount}
-            handleTileClick={() => (handleTileClick(id))}
+            handleTileClick={() => handleTileClick(id)}
+            toggleFlag={() => toggleFlagAt(id)}
           />
         ));
       }
@@ -209,6 +213,15 @@ class Board extends Component {
       newState[id] = { ...state[id], isRevealed: true };
     });
     this.setState({ ...newState });
+  }
+
+  toggleFlagAt(id) {
+    this.setState(state => ({
+      [id]: {
+        ...state[id],
+        isFlagged: !state[id].isFlagged,
+      },
+    }));
   }
 
   render() {
