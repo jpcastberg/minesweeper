@@ -118,12 +118,12 @@ class Board extends Component {
   async handleTileClick(clickedId) {
     const {
       props: {
-        gameInProgress, toggleGameInProgress, endGame, gameOver,
+        gameInProgress, startGame, endGame, gameIsOver,
       },
     } = this;
-    if (!gameInProgress && gameOver) return;
+    if (!gameInProgress && gameIsOver) return;
     if (!gameInProgress) {
-      toggleGameInProgress();
+      startGame();
       await this.populateMinesAround(clickedId);
     }
     const { state } = this;
@@ -136,7 +136,7 @@ class Board extends Component {
       mineIds.forEach((mineId) => {
         tileIdsToReveal.push(mineId);
       });
-      endGame();
+      endGame({ playerDidWin: false });
     } else if (
       !clickedTile.isMine
       && !clickedTile.isFlagged
@@ -276,8 +276,8 @@ Board.propTypes = {
   boardWidth: propTypes.number.isRequired,
   numberOfMines: propTypes.number.isRequired,
   gameInProgress: propTypes.bool.isRequired,
-  gameOver: propTypes.bool.isRequired,
-  toggleGameInProgress: propTypes.func.isRequired,
+  gameIsOver: propTypes.bool.isRequired,
+  startGame: propTypes.func.isRequired,
   endGame: propTypes.func.isRequired,
 };
 
