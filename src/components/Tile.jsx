@@ -4,11 +4,15 @@ import styled from 'styled-components';
 
 const generateTileStyling = (props) => {
   let styling = '';
-  if (props.isRevealed) {
-    styling += 'background-color: #b5b5b5';
+  if (props.isTriggeredMine) {
+    styling += 'background-color: #de1414;';
     return styling;
   }
-  return 'background-color: #737373';
+  if (props.isRevealed) {
+    styling += 'background-color: #b5b5b5;';
+    return styling;
+  }
+  return 'background-color: #737373;';
 };
 
 const TileStyle = styled.td`
@@ -20,7 +24,7 @@ const TileStyle = styled.td`
 `;
 
 const Tile = ({
-  isRevealed, isMine, isFlagged, adjacentMineCount, handleTileClick, toggleFlag,
+  isRevealed, isMine, isFlagged, adjacentMineCount, handleTileClick, toggleFlag, isTriggeredMine,
 }) => {
   let tileContent;
   if (!isRevealed && !isFlagged) {
@@ -40,6 +44,7 @@ const Tile = ({
         toggleFlag();
       }}
       isRevealed={isRevealed}
+      isTriggeredMine={isTriggeredMine}
       adjacentMineCount={adjacentMineCount}
     >
       {tileContent}
@@ -50,6 +55,7 @@ const Tile = ({
 Tile.propTypes = {
   isRevealed: propTypes.bool.isRequired,
   isMine: propTypes.bool.isRequired,
+  isTriggeredMine: propTypes.bool.isRequired,
   isFlagged: propTypes.bool.isRequired,
   adjacentMineCount: propTypes.number.isRequired,
   handleTileClick: propTypes.func.isRequired,
