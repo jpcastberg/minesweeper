@@ -19,7 +19,10 @@ class Game extends Component {
   }
 
   endGame() {
-    this.setState({ gameOver: true });
+    this.setState({
+      gameInProgress: false,
+      gameOver: true,
+    });
   }
 
   handlePlayerWin() {
