@@ -15,6 +15,7 @@ const TileStyle = styled.td`
   width: 30px;
   height: 30px;
   margin: 2px;
+  text-align: center;
   ${props => generateTileStyling(props)}
 `;
 
