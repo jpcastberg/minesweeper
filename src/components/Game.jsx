@@ -10,8 +10,20 @@ class Game extends Component {
       boardWidth: 10,
       numberOfMines: 10,
       gameInProgress: false,
+      gameOver: false,
+      playerWon: false,
     };
     this.toggleGameInProgress = this.toggleGameInProgress.bind(this);
+    this.endGame = this.endGame.bind(this);
+    this.handlePlayerWin = this.handlePlayerWin.bind(this);
+  }
+
+  endGame() {
+    this.setState({ gameOver: true });
+  }
+
+  handlePlayerWin() {
+    this.setState({ playerWon: true });
   }
 
   toggleGameInProgress() {
@@ -22,9 +34,11 @@ class Game extends Component {
   render() {
     const {
       state: {
-        boardHeight, boardWidth, numberOfMines, gameInProgress,
+        boardHeight, boardWidth, numberOfMines, gameInProgress, gameOver,
       },
       toggleGameInProgress,
+      endGame,
+      handlePlayerWin,
     } = this;
     return (
       <Board
@@ -32,7 +46,10 @@ class Game extends Component {
         boardWidth={boardWidth}
         numberOfMines={numberOfMines}
         gameInProgress={gameInProgress}
+        gameOver={gameOver}
         toggleGameInProgress={toggleGameInProgress}
+        endGame={endGame}
+        handlePlayerWin={handlePlayerWin}
       />
     );
   }
