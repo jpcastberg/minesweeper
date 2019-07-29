@@ -99,6 +99,7 @@ class Game extends Component {
         timeElapsedSinceGameStart,
         gameIsInProgress,
         gameIsOver,
+        playerWon,
         flagsPlaced,
       },
       incrementOrDecrementFlagsPlaced,
@@ -113,6 +114,8 @@ class Game extends Component {
             <Status
               timeElapsedSinceGameStart={timeElapsedSinceGameStart}
               flagsToBePlaced={numberOfMines - flagsPlaced}
+              gameIsOver={gameIsOver}
+              playerWon={playerWon}
             />
             <Board
               boardHeight={boardHeight}

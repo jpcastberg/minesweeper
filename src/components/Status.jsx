@@ -18,16 +18,20 @@ const zeroPaddedNumber = (number) => {
 };
 
 
-class Status extends Component {
-  render() {
-    const { props: { timeElapsedSinceGameStart, flagsToBePlaced } } = this;
-    return (
-      <StatusContainer>
-        <div>{zeroPaddedNumber(flagsToBePlaced)}</div>
-        <div>{zeroPaddedNumber(timeElapsedSinceGameStart)}</div>
-      </StatusContainer>
-    )
+const Status = ({ timeElapsedSinceGameStart, flagsToBePlaced, gameIsOver, playerWon }) => {
+  let emoji = (<span role="img" aria-label="Face">🙂</span>);
+  if (gameIsOver) {
+    emoji = playerWon
+      ? (<span role="img" aria-label="Face">😎</span>)
+      : (<span role="img" aria-label="Coffin">⚰️</span>);
   }
-}
+  return (
+    <StatusContainer>
+      <div>{zeroPaddedNumber(flagsToBePlaced)}</div>
+      {emoji}
+      <div>{zeroPaddedNumber(timeElapsedSinceGameStart)}</div>
+    </StatusContainer>
+  );
+};
 
 export default Status;
