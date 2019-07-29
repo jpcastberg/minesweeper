@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 
 import Board from './Board';
 
@@ -10,6 +10,24 @@ const GlobalStyle = createGlobalStyle`
     border-spacing: 0;
     border-collapse: collapse;
   }
+`;
+
+const AppContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100vh;
+`;
+
+const GameContainer = styled.div`
+  display: grid;
+  width: auto;
+  grid-template:
+    "status" 60px
+    "board" auto
+    "settings" 60px;
 `;
 
 class Game extends Component {
@@ -53,15 +71,19 @@ class Game extends Component {
     return (
       <>
         <GlobalStyle />
-        <Board
-          boardHeight={boardHeight}
-          boardWidth={boardWidth}
-          numberOfMines={numberOfMines}
-          gameIsInProgress={gameIsInProgress}
-          gameIsOver={gameIsOver}
-          startGame={startGame}
-          endGame={endGame}
-        />
+        <AppContainer>
+          <GameContainer>
+            <Board
+              boardHeight={boardHeight}
+              boardWidth={boardWidth}
+              numberOfMines={numberOfMines}
+              gameIsInProgress={gameIsInProgress}
+              gameIsOver={gameIsOver}
+              startGame={startGame}
+              endGame={endGame}
+            />
+          </GameContainer>
+        </AppContainer>
       </>
     );
   }

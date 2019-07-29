@@ -15,7 +15,7 @@ const generateTileStyling = (props) => {
   return 'background-color: #737373;';
 };
 
-const TileStyle = styled.td`
+const TileStyle = styled.div`
   width: 28px;
   height: 28px;
   border: 1px solid #000000;

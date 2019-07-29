@@ -1,9 +1,21 @@
 import React, { Component } from 'react';
 import propTypes from 'prop-types';
+import styled from 'styled-components';
 // eslint-disable-next-line no-unused-vars
 import regeneratorRuntime from 'regenerator-runtime';
 
 import Tile from './Tile';
+
+const BoardContainer = styled.div`
+  grid-area: board;
+`;
+
+const RowContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+`;
 
 class Board extends Component {
   constructor(props) {
@@ -100,9 +112,6 @@ class Board extends Component {
         const id = `${rowIdx},${colIdx}`;
         tileIds.push(id);
         const currentTile = tileData[id];
-        if (currentTile === undefined) {
-          debugger;
-        }
         const {
           isRevealed, isMine, isFlagged, adjacentMineCount, mineWasTriggered,
         } = currentTile;
@@ -119,7 +128,7 @@ class Board extends Component {
           />
         ));
       }
-      tiles.push(<tr key={tileIds.toString()}>{tileRow}</tr>);
+      tiles.push(<RowContainer key={tileIds.toString()}>{tileRow}</RowContainer>);
     }
     return tiles;
   }
@@ -301,11 +310,9 @@ class Board extends Component {
 
   render() {
     return (
-      <table>
-        <tbody>
-          {this.generateTileElements()}
-        </tbody>
-      </table>
+      <BoardContainer>
+        {this.generateTileElements()}
+      </BoardContainer>
     );
   }
 }
