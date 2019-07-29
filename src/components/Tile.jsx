@@ -16,10 +16,14 @@ const generateTileStyling = (props) => {
 };
 
 const TileStyle = styled.div`
+  display: flex;
   width: 28px;
   height: 28px;
   border: 1px solid #000000;
+  align-items: center;
+  justify-content: center;
   text-align: center;
+  cursor: default;
   ${props => generateTileStyling(props)}
 `;
 
