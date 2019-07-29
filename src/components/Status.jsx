@@ -9,13 +9,22 @@ const StatusContainer = styled.div`
   justify-content: space-around;
 `;
 
+const zeroPaddedNumber = (number) => {
+  let toString = String(number);
+  while (toString.length < 3) {
+    toString = `0${toString}`;
+  }
+  return toString;
+};
+
+
 class Status extends Component {
   render() {
     const { props: { timeElapsedSinceGameStart, flagsToBePlaced } } = this;
     return (
       <StatusContainer>
-        <div>{flagsToBePlaced}</div>
-        <div>{timeElapsedSinceGameStart}</div>
+        <div>{zeroPaddedNumber(flagsToBePlaced)}</div>
+        <div>{zeroPaddedNumber(timeElapsedSinceGameStart)}</div>
       </StatusContainer>
     )
   }

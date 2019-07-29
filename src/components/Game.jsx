@@ -52,6 +52,13 @@ class Game extends Component {
     this.incrementOrDecrementFlagsPlaced = this.incrementOrDecrementFlagsPlaced.bind(this);
   }
 
+  componentDidUpdate() {
+    const { state: { timeElapsedSinceGameStart, timeElapsedInterval } } = this;
+    if (timeElapsedSinceGameStart === 999) {
+      clearInterval(timeElapsedInterval);
+    }
+  }
+
   endGame(context) {
     const { state: { timeElapsedInterval } } = this;
     const newState = {
