@@ -11,10 +11,11 @@ const StatusContainer = styled.div`
 
 class Status extends Component {
   render() {
-    const { props: { timeElapsedSinceGameStart } } = this;
+    const { props: { timeElapsedSinceGameStart, flagsToBePlaced } } = this;
     return (
       <StatusContainer>
-        {timeElapsedSinceGameStart}
+        <div>{flagsToBePlaced}</div>
+        <div>{timeElapsedSinceGameStart}</div>
       </StatusContainer>
     )
   }

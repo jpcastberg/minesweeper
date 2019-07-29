@@ -38,6 +38,7 @@ class Game extends Component {
       boardHeight: 10,
       boardWidth: 10,
       numberOfMines: 10,
+      flagsPlaced: 0,
       timeElapsedSinceGameStart: 0,
       timeElapsedInterval: null,
       gameIsInProgress: false,
@@ -46,6 +47,7 @@ class Game extends Component {
     };
     this.startGame = this.startGame.bind(this);
     this.endGame = this.endGame.bind(this);
+    this.incrementOrDecrementFlagsPlaced = this.incrementOrDecrementFlagsPlaced.bind(this);
   }
 
   endGame(context) {
@@ -59,6 +61,14 @@ class Game extends Component {
     }
     clearInterval(timeElapsedInterval);
     this.setState(newState);
+  }
+
+  incrementOrDecrementFlagsPlaced(context) {
+    if (context.increment) {
+      this.setState(state => ({ flagsPlaced: state.flagsPlaced + 1 }));
+    } else if (context.decrement) {
+      this.setState(state => ({ flagsPlaced: state.flagsPlaced - 1 }));
+    }
   }
 
   startGame() {
@@ -80,7 +90,9 @@ class Game extends Component {
         timeElapsedSinceGameStart,
         gameIsInProgress,
         gameIsOver,
+        flagsPlaced,
       },
+      incrementOrDecrementFlagsPlaced,
       startGame,
       endGame,
     } = this;
@@ -91,6 +103,7 @@ class Game extends Component {
           <GameContainer>
             <Status
               timeElapsedSinceGameStart={timeElapsedSinceGameStart}
+              flagsToBePlaced={numberOfMines - flagsPlaced}
             />
             <Board
               boardHeight={boardHeight}
@@ -98,6 +111,7 @@ class Game extends Component {
               numberOfMines={numberOfMines}
               gameIsInProgress={gameIsInProgress}
               gameIsOver={gameIsOver}
+              incrementOrDecrementFlagsPlaced={incrementOrDecrementFlagsPlaced}
               startGame={startGame}
               endGame={endGame}
             />

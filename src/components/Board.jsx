@@ -276,8 +276,14 @@ class Board extends Component {
   }
 
   toggleFlagAt(id) {
+    const { props: { incrementOrDecrementFlagsPlaced } } = this;
     this.setState((state) => {
       const { tileData, tileData: { [id]: { isFlagged } } } = state;
+      if (isFlagged) {
+        incrementOrDecrementFlagsPlaced({ decrement: true });
+      } else {
+        incrementOrDecrementFlagsPlaced({ increment: true });
+      }
       return ({
         tileData: {
           ...tileData,
