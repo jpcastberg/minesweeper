@@ -25,31 +25,25 @@ class Board extends Component {
     }
   }
 
-  getRandomId() {
-    const { props: { boardHeight, boardWidth } } = this;
-    const getRandomInt = max => (Math.floor(Math.random() * max));
-    return `${getRandomInt(boardHeight)},${getRandomInt(boardWidth)}`;
-  }
-
   getMineIds() {
-    const { state, props: { boardHeight, boardWidth } } = this;
+    const { state: { tileData }, props: { boardHeight, boardWidth } } = this;
     const mineIds = [];
     for (let i = 0; i < boardHeight; i += 1) {
       for (let j = 0; j < boardWidth; j += 1) {
         const currentId = `${i},${j}`;
-        if (state[currentId].isMine) mineIds.push(currentId);
+        if (tileData[currentId].isMine) mineIds.push(currentId);
       }
     }
     return mineIds;
   }
 
   getTileIdsToRevealAround(id) {
-    const { state } = this;
+    const { state: { tileData } } = this;
     const tileIds = [];
     const seen = { [id]: { hasBeenProcessed: true } };
     const queue = [];
     this.forEachTileAround(id, (surroundingTile) => {
-      if (!state[surroundingTile.id].isRevealed) {
+      if (!tileData[surroundingTile.id].isRevealed) {
         queue.push(surroundingTile.id);
         seen[surroundingTile.id] = { hasBeenProcessed: false };
       }
@@ -58,13 +52,13 @@ class Board extends Component {
       const currentId = queue.shift();
       if (!seen[currentId].hasBeenProcessed) {
         if (
-          !state[currentId].isMine
-          && !state[currentId].isFlagged
-          && !state[currentId].isRevealed
+          !tileData[currentId].isMine
+          && !tileData[currentId].isFlagged
+          && !tileData[currentId].isRevealed
         ) {
           tileIds.push(currentId);
         }
-        if (state[currentId].adjacentMineCount === 0) {
+        if (tileData[currentId].adjacentMineCount === 0) {
           this.forEachTileAround(currentId, (surroundingTile) => {
             if (!seen[surroundingTile.id]) {
               queue.push(surroundingTile.id);
@@ -79,7 +73,7 @@ class Board extends Component {
   }
 
   forEachTileAround(id, cb) {
-    const { state } = this;
+    const { state: { tileData } } = this;
     const rowIdx = Number(id.split(',')[0]);
     const colIdx = Number(id.split(',')[1]);
     const validSurroundingTiles = [];
@@ -87,7 +81,7 @@ class Board extends Component {
       for (let j = -1; j <= 1; j += 1) {
         const currentId = `${rowIdx + i},${colIdx + j}`;
         if ((i !== 0 || j !== 0) && this.isValidId(currentId)) {
-          validSurroundingTiles.push(state[currentId]);
+          validSurroundingTiles.push(tileData[currentId]);
         }
       }
     }
@@ -96,7 +90,7 @@ class Board extends Component {
 
   generateTileElements() {
     const {
-      props: { boardHeight, boardWidth }, state, handleTileClick, toggleFlagAt,
+      props: { boardHeight, boardWidth }, state: { tileData }, handleTileClick, toggleFlagAt,
     } = this;
     const tiles = [];
     for (let rowIdx = 0; rowIdx < boardHeight; rowIdx += 1) {
@@ -105,7 +99,10 @@ class Board extends Component {
       for (let colIdx = 0; colIdx < boardWidth; colIdx += 1) {
         const id = `${rowIdx},${colIdx}`;
         tileIds.push(id);
-        const currentTile = state[id];
+        const currentTile = tileData[id];
+        if (currentTile === undefined) {
+          debugger;
+        }
         const {
           isRevealed, isMine, isFlagged, adjacentMineCount, mineWasTriggered,
         } = currentTile;
@@ -138,15 +135,15 @@ class Board extends Component {
       startGame();
       await this.populateMinesAround(clickedId);
     }
-    const { state } = this;
-    const clickedTile = state[clickedId];
+    const { state: { tileData } } = this;
+    const clickedTile = tileData[clickedId];
     if (clickedTile.isRevealed || clickedTile.isFlagged) return;
     const tileIdsToReveal = [clickedId];
     if (clickedTile.isMine) {
       await this.triggerMineAt(clickedId);
       const mineIds = this.getMineIds();
       mineIds.forEach((mineId) => {
-        const currentMine = state[mineId];
+        const currentMine = tileData[mineId];
         if (mineId === clickedId || currentMine.isFlagged) return;
         tileIdsToReveal.push(mineId);
       });
@@ -176,9 +173,9 @@ class Board extends Component {
       }
     }
     return {
-      ...tileData,
       countOfUnrevealedSafeTiles,
       mineWasTriggered: false,
+      tileData,
     };
   }
 
@@ -190,23 +187,27 @@ class Board extends Component {
   }
 
   populateMinesAround(clickedId) {
-    const { state, props: { boardHeight, boardWidth, numberOfMines } } = this;
+    const { state: { tileData }, props: { boardHeight, boardWidth, numberOfMines } } = this;
     const offLimitsToMines = { [clickedId]: true };
+    const getRandomId = () => {
+      const getRandomInt = max => (Math.floor(Math.random() * max));
+      return `${getRandomInt(boardHeight)},${getRandomInt(boardWidth)}`;
+    };
     if ((boardHeight * boardWidth) - numberOfMines >= 9) {
       this.forEachTileAround(clickedId, (surroundingTile) => {
         offLimitsToMines[surroundingTile.id] = true;
       });
     }
-    const updatedMineData = {};
+    const updatedTileData = {};
     for (let minesPlaced = 1; minesPlaced <= numberOfMines; minesPlaced += 1) {
       let idAtWhichToPlaceMine;
       // Attempt to place the mine randomly
       for (let attemptCount = 0; attemptCount <= 10 && !idAtWhichToPlaceMine; attemptCount += 1) {
-        const randomId = this.getRandomId();
+        const randomId = getRandomId();
         if (
           !offLimitsToMines[randomId]
-          && (!updatedMineData[randomId]
-          || !updatedMineData[randomId].isMine)
+          && (!updatedTileData[randomId]
+          || !updatedTileData[randomId].isMine)
         ) {
           idAtWhichToPlaceMine = randomId;
         }
@@ -217,7 +218,7 @@ class Board extends Component {
           for (let j = 0; j < boardWidth && !idAtWhichToPlaceMine; j += 1) {
             const currentId = `${i},${j}`;
             if (
-              (!updatedMineData[currentId] || !updatedMineData[currentId].isMine)
+              (!updatedTileData[currentId] || !updatedTileData[currentId].isMine)
               && !offLimitsToMines[currentId]
             ) {
               idAtWhichToPlaceMine = currentId;
@@ -225,56 +226,76 @@ class Board extends Component {
           }
         }
       }
-      updatedMineData[idAtWhichToPlaceMine] = {
-        ...updatedMineData[idAtWhichToPlaceMine] || state[idAtWhichToPlaceMine],
+      updatedTileData[idAtWhichToPlaceMine] = {
+        ...updatedTileData[idAtWhichToPlaceMine] || tileData[idAtWhichToPlaceMine],
         isMine: true,
         mineWasTriggered: false,
       };
       this.forEachTileAround(idAtWhichToPlaceMine, (surroundingTile) => {
-        const existingTileData = updatedMineData[surroundingTile.id]
-        || state[surroundingTile.id];
-        updatedMineData[surroundingTile.id] = {
+        const existingTileData = updatedTileData[surroundingTile.id]
+        || tileData[surroundingTile.id];
+        updatedTileData[surroundingTile.id] = {
           ...existingTileData,
           adjacentMineCount: existingTileData.adjacentMineCount + 1,
         };
       });
     }
     return new Promise((res) => {
-      this.setState({ ...updatedMineData }, () => res());
+      this.setState({
+        tileData: {
+          ...tileData,
+          ...updatedTileData,
+        },
+      }, () => res());
     });
   }
 
   revealTiles(idList) {
-    const { state, state: { countOfUnrevealedSafeTiles } } = this;
-    const newState = {};
+    const { state: { countOfUnrevealedSafeTiles, tileData: existingTileData } } = this;
+    const newState = {
+      countOfUnrevealedSafeTiles,
+      tileData: { ...existingTileData },
+    };
     let countOfSafeTilesRevealed = 0;
     idList.forEach((id) => {
-      const currentTile = state[id];
-      newState[id] = { ...state[id], isRevealed: true };
+      const currentTile = existingTileData[id];
+      newState.tileData[id] = { ...currentTile, isRevealed: true };
       if (!currentTile.isMine) countOfSafeTilesRevealed += 1;
     });
     newState.countOfUnrevealedSafeTiles = countOfUnrevealedSafeTiles - countOfSafeTilesRevealed;
-    this.setState({ ...newState });
+    this.setState(newState);
   }
 
   toggleFlagAt(id) {
-    this.setState(state => ({
-      [id]: {
-        ...state[id],
-        isFlagged: !state[id].isFlagged,
-      },
-    }));
+    this.setState((state) => {
+      const { tileData, tileData: { [id]: { isFlagged } } } = state;
+      return ({
+        tileData: {
+          ...tileData,
+          [id]: {
+            ...tileData[id],
+            isFlagged: !isFlagged,
+          },
+        },
+      });
+    });
   }
 
   triggerMineAt(clickedId) {
     return new Promise((res) => {
-      this.setState(state => ({
-        mineWasTriggered: true,
-        [clickedId]: {
-          ...state[clickedId],
+      this.setState((state) => {
+        const { tileData } = state;
+        return ({
           mineWasTriggered: true,
-        },
-      }), () => res());
+          tileData: {
+            ...tileData,
+            [clickedId]: {
+              ...tileData[clickedId],
+              mineWasTriggered: true,
+            },
+          },
+        });
+      }, () => res());
     });
   }
 
