@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 
+import Status from './Status';
 import Board from './Board';
 
 const GlobalStyle = createGlobalStyle`
@@ -37,6 +38,8 @@ class Game extends Component {
       boardHeight: 10,
       boardWidth: 10,
       numberOfMines: 10,
+      timeElapsedSinceGameStart: 0,
+      timeElapsedInterval: null,
       gameIsInProgress: false,
       gameIsOver: false,
       playerWon: false,
@@ -46,6 +49,7 @@ class Game extends Component {
   }
 
   endGame(context) {
+    const { state: { timeElapsedInterval } } = this;
     const newState = {
       gameIsInProgress: false,
       gameIsOver: true,
@@ -53,11 +57,18 @@ class Game extends Component {
     if (context.playerDidWin) {
       newState.playerWon = true;
     }
+    clearInterval(timeElapsedInterval);
     this.setState(newState);
   }
 
   startGame() {
-    this.setState({ gameIsInProgress: true });
+    const timeElapsedInterval = setInterval(() => {
+      this.setState(state => ({ timeElapsedSinceGameStart: state.timeElapsedSinceGameStart + 1 }));
+    }, 1000);
+    this.setState({
+      timeElapsedInterval,
+      gameIsInProgress: true,
+    });
   }
 
   render() {
@@ -73,6 +84,7 @@ class Game extends Component {
         <GlobalStyle />
         <AppContainer>
           <GameContainer>
+            <Status />
             <Board
               boardHeight={boardHeight}
               boardWidth={boardWidth}
