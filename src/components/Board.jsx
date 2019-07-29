@@ -146,7 +146,8 @@ class Board extends Component {
       await this.triggerMineAt(clickedId);
       const mineIds = this.getMineIds();
       mineIds.forEach((mineId) => {
-        if (mineId === clickedId) return;
+        const currentMine = state[mineId];
+        if (mineId === clickedId || currentMine.isFlagged) return;
         tileIdsToReveal.push(mineId);
       });
     } else if (clickedTile.adjacentMineCount === 0) {
