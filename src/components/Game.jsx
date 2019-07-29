@@ -6,6 +6,8 @@ import Board from './Board';
 
 const GlobalStyle = createGlobalStyle`
   * {
+    @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+    font-family: 'Open Sans', sans-serif;
     margin: 0;
     padding: 0;
     border-spacing: 0;
