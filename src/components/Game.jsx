@@ -74,7 +74,12 @@ class Game extends Component {
   render() {
     const {
       state: {
-        boardHeight, boardWidth, numberOfMines, gameIsInProgress, gameIsOver,
+        boardHeight,
+        boardWidth,
+        numberOfMines,
+        timeElapsedSinceGameStart,
+        gameIsInProgress,
+        gameIsOver,
       },
       startGame,
       endGame,
@@ -84,7 +89,9 @@ class Game extends Component {
         <GlobalStyle />
         <AppContainer>
           <GameContainer>
-            <Status />
+            <Status
+              timeElapsedSinceGameStart={timeElapsedSinceGameStart}
+            />
             <Board
               boardHeight={boardHeight}
               boardWidth={boardWidth}
