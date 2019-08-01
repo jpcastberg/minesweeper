@@ -1,19 +1,9 @@
 import React from 'react';
 import propTypes from 'prop-types';
-import styled from 'styled-components';
 
 import Tile from './Tile';
 
-const BoardContainer = styled.div`
-  grid-area: board;
-`;
-
-const RowContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-`;
+import { BoardContainer, RowContainer } from '../styles/boardStyles';
 
 const Board = ({
   boardHeight,

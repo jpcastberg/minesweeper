@@ -1,41 +1,13 @@
 import React, { Component } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
 // eslint-disable-next-line no-unused-vars
 import regeneratorRuntime from 'regenerator-runtime';
 
 import Status from './Status';
 import Board from './Board';
 
+import { GlobalStyle, AppContainer, GameContainer } from '../styles/gameStyles';
+
 import generateNewGameState from '../lib/generateNewGameState';
-
-const GlobalStyle = createGlobalStyle`
-  * {
-    @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
-    font-family: 'Open Sans', sans-serif;
-    margin: 0;
-    padding: 0;
-    border-spacing: 0;
-    border-collapse: collapse;
-  }
-`;
-
-const AppContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  height: 100vh;
-`;
-
-const GameContainer = styled.div`
-  display: grid;
-  width: auto;
-  grid-template:
-    "status" 60px
-    "board" auto
-    "settings" 60px;
-`;
 
 class Game extends Component {
   constructor() {
