@@ -4,6 +4,7 @@ import regeneratorRuntime from 'regenerator-runtime';
 
 import Status from './Status';
 import Board from './Board';
+import Settings from './Settings';
 
 import { GlobalStyle, AppContainer, GameContainer } from '../styles/gameStyles';
 
@@ -346,6 +347,12 @@ class Game extends Component {
               tileData={tileData}
               handleTileClickAt={handleTileClickAt}
               toggleFlagAt={toggleFlagAt}
+            />
+            <Settings
+              boardHeight={boardHeight}
+              boardWidth={boardWidth}
+              numberOfMines={numberOfMines}
+              resetGame={resetGame}
             />
           </GameContainer>
         </AppContainer>

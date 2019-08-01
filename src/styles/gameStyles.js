@@ -18,7 +18,6 @@ export const AppContainer = styled.div`
   align-items: center;
   justify-content: center;
   text-align: center;
-  height: 100vh;
 `;
 
 export const GameContainer = styled.div`
