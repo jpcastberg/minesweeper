@@ -1,30 +1,38 @@
 /* eslint-disable import/prefer-default-export */
 import styled, { createGlobalStyle } from 'styled-components';
 
-export const GlobalStyle = createGlobalStyle`
-  * {
+const GlobalStyle = createGlobalStyle`
     @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+  * {
     font-family: 'Open Sans', sans-serif;
     margin: 0;
     padding: 0;
     border-spacing: 0;
     border-collapse: collapse;
   }
+  html {
+    background: url('https://i.imgur.com/8wqEp5z.png');
+    background-repeat: no-repeat;
+    background-size: 100vw 100vh;
+    background-attachment: fixed;
+  }
 `;
 
-export const AppContainer = styled.div`
+const AppContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
+  min-height: 100vh;
 `;
 
-export const GameContainer = styled.div`
+const GameContainer = styled.div`
   display: grid;
-  width: auto;
   grid-template:
     "status" 60px
     "board" auto
     "settings" 60px;
 `;
+
+export { GlobalStyle, AppContainer, GameContainer };

@@ -1,21 +1,7 @@
 import React from 'react';
 import propTypes from 'prop-types';
-import styled from 'styled-components';
 
-const StatusContainer = styled.div`
-  grid-area: status;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-around;
-`;
-
-const EmojiContainer = styled.div`
-  font-size: 32px;
-  text-align: center;
-  vertical-align: center;
-  cursor: pointer;
-`;
+import { StatusContainer, EmojiContainer } from '../styles/statusStyles';
 
 const zeroPaddedNumber = (number) => {
   let toString = String(number);

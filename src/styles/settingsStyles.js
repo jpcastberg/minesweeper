@@ -7,6 +7,7 @@ const SettingsContainer = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
+  background-color: rgba(181, 181, 181, 0.5);
 `;
 
 const Setting = styled.div`
