@@ -4,16 +4,17 @@ import styled, { createGlobalStyle } from 'styled-components';
 const GlobalStyle = createGlobalStyle`
     @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
   * {
-    font-family: 'Open Sans', sans-serif;
     margin: 0;
     padding: 0;
     border-spacing: 0;
     border-collapse: collapse;
   }
   html {
+    font-family: 'Open Sans', sans-serif;
     background: url('https://i.imgur.com/8wqEp5z.png');
     background-size: 100%;
     background-attachment: fixed;
+    user-select: none;
   }
 `;
 
