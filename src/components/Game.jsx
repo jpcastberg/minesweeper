@@ -221,9 +221,11 @@ class Game extends Component {
     this.setState(newState);
   }
 
-  toggleFlagAt(id) {
+  toggleFlagAt(clickedId) {
+    const { state: { tileData: { [clickedId]: { isRevealed } } } } = this;
+    if (isRevealed) return;
     this.setState((state) => {
-      const { tileData, tileData: { [id]: { isFlagged } } } = state;
+      const { tileData, tileData: { [clickedId]: { isFlagged } } } = state;
       if (isFlagged) {
         this.incrementOrDecrementFlagsPlaced({ decrement: true });
       } else {
@@ -232,8 +234,8 @@ class Game extends Component {
       return ({
         tileData: {
           ...tileData,
-          [id]: {
-            ...tileData[id],
+          [clickedId]: {
+            ...tileData[clickedId],
             isFlagged: !isFlagged,
           },
         },
