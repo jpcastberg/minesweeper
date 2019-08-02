@@ -1,4 +1,4 @@
-const generateNewGameState = (boardHeight = 20, boardWidth = 20, numberOfMines = 10) => {
+const generateNewGameState = (boardHeight = 15, boardWidth = 25, numberOfMines = 50) => {
   const tileData = {};
   const countOfUnrevealedSafeTiles = (boardHeight * boardWidth) - numberOfMines;
   for (let i = 0; i < boardHeight; i += 1) {
