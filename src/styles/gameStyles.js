@@ -12,8 +12,7 @@ const GlobalStyle = createGlobalStyle`
   }
   html {
     background: url('https://i.imgur.com/8wqEp5z.png');
-    background-repeat: no-repeat;
-    background-size: 100vw 100vh;
+    background-size: 100%;
     background-attachment: fixed;
   }
 `;
@@ -25,6 +24,7 @@ const AppContainer = styled.div`
   justify-content: center;
   text-align: center;
   min-height: 100vh;
+  min-width: 900px;
 `;
 
 const GameContainer = styled.div`
