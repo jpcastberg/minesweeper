@@ -2,12 +2,14 @@
   "name": "minesweeper",
   "version": "1.0.0",
   "description": "Minesweeper built with React!",
-  "main": "server/index.js",
+  "homepage": "https://jpcastberg.github.io/minesweeper",
+  "main": "src/index.jsx",
   "scripts": {
-    "build": "webpack -d -w",
+    "build-dev": "webpack -d -w",
     "start": "reload -d public/ -b",
-    "build-prod": "webpack -p",
-    "start-prod": "node server/index.js"
+    "build": "webpack -p",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d public"
   },
   "engines": {
     "node": ">=8.0.0"
@@ -16,6 +18,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "gh-pages": "^2.0.1",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
