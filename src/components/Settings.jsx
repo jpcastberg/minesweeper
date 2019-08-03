@@ -61,15 +61,27 @@ class Settings extends Component {
       <SettingsContainer>
         <Setting>
           Board Height:&nbsp;
-          <SettingInput type="text" value={heightValue} onChange={e => this.updateValue('heightValue', e.target.value)} />
+          <SettingInput
+            type="text"
+            value={heightValue}
+            onChange={e => this.updateValue('heightValue', e.target.value)}
+          />
         </Setting>
         <Setting>
           Board Width:&nbsp;
-          <SettingInput type="text" value={widthValue} onChange={e => this.updateValue('widthValue', e.target.value)} />
+          <SettingInput
+            type="text"
+            value={widthValue}
+            onChange={e => this.updateValue('widthValue', e.target.value)}
+          />
         </Setting>
         <Setting>
           Number Of Mines:&nbsp;
-          <SettingInput type="text" value={numberOfMinesValue} onChange={e => this.updateValue('numberOfMinesValue', e.target.value)} />
+          <SettingInput
+            type="text"
+            value={numberOfMinesValue}
+            onChange={e => this.updateValue('numberOfMinesValue', e.target.value)}
+          />
         </Setting>
         {this.generateButton()}
       </SettingsContainer>
