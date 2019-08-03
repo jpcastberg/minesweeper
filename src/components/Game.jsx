@@ -334,9 +334,6 @@ class Game extends Component {
         <AppContainer>
           <GameContainer>
             <Status
-              boardHeight={boardHeight}
-              boardWidth={boardWidth}
-              numberOfMines={numberOfMines}
               timeElapsedSinceGameStart={timeElapsedSinceGameStart}
               flagsToBePlaced={numberOfMines - flagsPlaced}
               gameIsOver={gameIsOver}
